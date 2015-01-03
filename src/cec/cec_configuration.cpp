@@ -20,10 +20,8 @@ void CecConfiguration::set_params(Params params) {
 
 void CecConfiguration::set_data_set(const Rcpp::NumericMatrix proxy_dataset) {
     //reuses memory and avoids extra copy
-    boost::shared_ptr<const arma::mat> points(
-                new arma::mat(proxy_dataset.begin(), proxy_dataset.nrow(),
-                              proxy_dataset.ncol(), false));
-    m_params.dataset = points;
+    arma::mat* ptr = new arma::mat(proxy_dataset.begin(), proxy_dataset.nrow(), proxy_dataset.ncol(), false);
+    m_params.dataset = boost::shared_ptr<const Dataset>(new DatasetArma(ptr));
 }
 
 void CecConfiguration::set_eps(const double kill_threshold) {
@@ -105,7 +103,7 @@ void CecConfiguration::set_nclusters(const unsigned int nclusters) {
     else
         m_params.nclusters = CONST::nclusters_init;
 
-    if (m_params.dataset->n_rows < m_params.nclusters)
+    if (m_params.dataset->size() < m_params.nclusters)
         Rcpp::stop(CONST::ERRORS::dataset_size);
 }
 

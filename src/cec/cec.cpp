@@ -151,7 +151,7 @@ void CecModel::find_best_cec() {
         break; // TODO: handle no assignment
     }
 
-    assignment->resize(m_config.get_params().dataset->n_rows);
+    assignment->resize(m_config.get_params().dataset->size());
     (*assignment_type)(*assignment);
 
     init(hartigan, assignment);
@@ -197,16 +197,16 @@ double CecModel::entropy() {
     return s;
 }
 
-std::vector<unsigned int> &CecModel::get_assignment() const {
-    return *m_assignment;
+boost::shared_ptr<std::vector<unsigned int> > &CecModel::get_assignment() const {
+    return m_assignment;
 }
 
 void CecModel::set_assignment(std::vector<unsigned int> assignment) {
     //TODO set assignment
 }
 
-arma::mat CecModel::get_points() {
-    return *m_points;
+boost::shared_ptr<const Dataset> CecModel::get_points() {
+    return m_points;
 }
 
 std::vector<arma::rowvec> CecModel::centers() const {

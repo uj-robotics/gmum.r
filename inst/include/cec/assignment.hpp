@@ -4,6 +4,7 @@
 #include "boost/foreach.hpp"
 #include <RcppArmadillo.h>
 #include <list>
+#include "dataset.hpp"
 
 namespace gmum {
 
@@ -13,14 +14,15 @@ namespace gmum {
  */
 class Assignment {
 protected:
-    const arma::mat &m_points;
+    const Dataset &m_points;
     const unsigned int m_nclusters;
 public:
-    Assignment(const arma::mat &points, const unsigned int nclusters) :
+    Assignment(const Dataset &points, const unsigned int nclusters) :
         m_points(points), m_nclusters(nclusters) {
     }
 
     virtual void operator()(std::vector<unsigned int> &assignment) = 0;
+    void operator()(bn::ndarray& output);
     virtual ~Assignment() {
     }
 };
@@ -29,21 +31,24 @@ public:
  * @centers are ids of rows in points
  */
 unsigned int find_nearest(unsigned int i,
-                          const std::vector<unsigned int> &centers, const arma::mat &points);
+                          const std::vector<unsigned int> &centers,
+			  const Dataset &points);
 
 unsigned int find_nearest(unsigned int i,
                           const std::list<std::vector<double> > &centers,
-                          const arma::mat &points);
+                          const Dataset &points);
 
 /**
  * @centers are ids of rows in points
  */
-void assign_points(std::vector<unsigned int> &assignment,
-                   const std::vector<unsigned int> &centers, const arma::mat &points);
 
-void assign_points(std::vector<unsigned int> &assignment,
-                   const std::list<std::vector<double> > &centers,
-                   const arma::mat &points);
+template <class T>
+void assignPoints(std::vector<unsigned int> &assignment,
+		  const T &centers,
+		  const Dataset &points) {
+
+    for(unsigned int i=0; i<assignment.size(); ++i)
+      assignment[i] = findNearest(i, centers, points);
 }
 
 #endif

@@ -3,15 +3,16 @@
 namespace gmum {
 
 unsigned int find_nearest(unsigned int i,
-                          const std::vector<unsigned int> &centers, const arma::mat &points) {
+                          const std::vector<unsigned int> &centers,
+			  const Dataset &points) {
 
-    arma::rowvec point = points.row(i);
+    arma::rowvec point = points.getPoint(i);
     float distance = std::numeric_limits<float>::max();
     unsigned int nearest = -1;
 
     for (unsigned int i = 0; i < centers.size(); ++i) {
 
-        arma::rowvec vec = points.row(centers[i]) - point;
+        arma::rowvec vec = points.getPoint(centers[i]) - point;
         float temp_dist = arma::as_scalar(vec * vec.t());
 
         if (distance > temp_dist) {
@@ -25,9 +26,9 @@ unsigned int find_nearest(unsigned int i,
 
 unsigned int find_nearest(unsigned int i,
                           const std::list<std::vector<double> > &centers,
-                          const arma::mat &points) {
+                          const Dataset &points) {
 
-    arma::rowvec point = points.row(i);
+    arma::rowvec point = points.getPoint(i);
     float distance = std::numeric_limits<float>::max();
     unsigned int nearest = -1;
     unsigned int j = 0;
@@ -48,19 +49,12 @@ unsigned int find_nearest(unsigned int i,
     return nearest;
 }
 
-void assign_points(std::vector<unsigned int> &assignment,
-                   const std::vector<unsigned int> &centers, const arma::mat &points) {
+void Assignment::operator()(bn::ndarray& output) {
 
-    for (unsigned int i = 0; i < assignment.size(); ++i)
-        assignment[i] = find_nearest(i, centers, points);
-}
-
-void assign_points(std::vector<unsigned int> &assignment,
-                   const std::list<std::vector<double> > &centers,
-                   const arma::mat &points) {
-
-    for (unsigned int i = 0; i < assignment.size(); ++i)
-        assignment[i] = find_nearest(i, centers, points);
+  std::vector<unsigned int> assignment(output.shape(0));
+  (*this)(assignment);
+  for(int i=0; i<assignment.size(); i++)
+    output[i] = assignment[i];
 }
 
 }

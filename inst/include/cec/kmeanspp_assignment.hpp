@@ -24,10 +24,10 @@ struct Pair {
 };
 
 void init_assign_kmeanspp(std::vector<unsigned int> &assignment,
-                          const arma::mat &points, unsigned int nclusters);
+                          const Dataset &points, unsigned int nclusters);
 
 void calculate_distance(const std::vector<unsigned int> &centers,
-                        std::list<Pair> &selected, const arma::mat &points);
+                        std::list<Pair> &selected, const Dataset &points);
 
 std::list<Pair>::iterator choose(
         boost::random::bernoulli_distribution<> &bernoulli,
@@ -35,7 +35,7 @@ std::list<Pair>::iterator choose(
 
 class KmeansppAssignment: public Assignment {
 public:
-    KmeansppAssignment(const arma::mat &points, const int nclusters) :
+    KmeansppAssignment(const Dataset &points, const int nclusters) :
         Assignment::Assignment(points, nclusters) {
     }
     virtual void operator()(std::vector<unsigned int> &assignment);

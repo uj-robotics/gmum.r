@@ -21,7 +21,7 @@ private:
     std::vector<boost::shared_ptr<gmum::Cluster> > m_clusters;
     gmum::TotalResult m_result;
     boost::shared_ptr<std::vector<unsigned int> > m_assignment;
-    boost::shared_ptr<const arma::mat> m_points;
+    boost::shared_ptr<const Dataset> m_points;
     boost::shared_ptr<gmum::Algorithm> m_algorithm;
     double m_kill_threshold;
     std::vector<bool> m_inv_set;
@@ -41,9 +41,9 @@ public:
     void loop();
     void single_loop();
     double entropy();
-    std::vector<unsigned int> &get_assignment() const;
+    boost::shared_ptr<std::vector<unsigned int> > &get_assignment() const;
     void set_assignment(std::vector<unsigned int> m_assignment);
-    arma::mat get_points();
+    boost::shared_ptr<const Dataset> get_points();
     std::vector<arma::rowvec> centers() const;
     std::vector<arma::mat> cov() const;
     unsigned int iters() const;

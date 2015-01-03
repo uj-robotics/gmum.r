@@ -9,7 +9,7 @@ ClusterCustomFunction::ClusterCustomFunction(int count,
 }
 
 ClusterCustomFunction::ClusterCustomFunction(unsigned int id,
-                                             const std::vector<unsigned int> &assignment, const arma::mat &points,
+                                             const std::vector<unsigned int> &assignment, const Dataset &points,
                                              const std::string &function_name) :
     ClusterUseCovMat(id, assignment, points), m_function_name(function_name) {
     calculate_entropy();

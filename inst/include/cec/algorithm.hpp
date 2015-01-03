@@ -3,6 +3,7 @@
 
 #include <list>
 #include "cluster.hpp"
+#include "dataset.hpp"
 
 namespace gmum {
 
@@ -43,8 +44,9 @@ public:
     Algorithm(bool log_nclusters, bool log_energy) :
         m_log_nclusters(log_nclusters), m_log_energy(log_energy) {
     }
-    virtual TotalResult loop(const arma::mat &points,
-                             std::vector<unsigned int> &assignment, double kill_threshold,
+    virtual TotalResult loop(const Dataset &points,
+                             std::vector<unsigned int> &assignment,
+			     double kill_threshold,
                              std::vector<boost::shared_ptr<Cluster> > &clusters)=0;
     virtual SingleResult single_loop(const arma::mat &points,
                                      std::vector<unsigned int> &assignment, double kill_threshold,

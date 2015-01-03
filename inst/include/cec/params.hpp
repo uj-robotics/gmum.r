@@ -6,6 +6,7 @@
 #include <vector>
 #include "boost/smart_ptr.hpp"
 #include "cluster_params.hpp"
+#include "dataset.hpp"
 
 namespace gmum {
 
@@ -15,7 +16,7 @@ enum AssignmentType {
 
 struct Params {
 public:
-    boost::shared_ptr<const arma::mat> dataset;
+    boost::shared_ptr<const Dataset> dataset;
     double kill_threshold;
     unsigned int nclusters;
     bool log_nclusters;

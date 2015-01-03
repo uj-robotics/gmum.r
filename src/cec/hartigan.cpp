@@ -5,7 +5,7 @@ namespace gmum {
 
 Hartigan::Hartigan(bool log_nclusters, bool log_energy) : Algorithm(log_nclusters, log_energy) {}
 
-TotalResult Hartigan::loop(const arma::mat &points, std::vector<unsigned int> &assignment,
+TotalResult Hartigan::loop(const Dataset &points, std::vector<unsigned int> &assignment,
                            double kill_threshold, std::vector<boost::shared_ptr<Cluster> > &clusters) {
     TotalResult result;
     SingleResult sr;
@@ -31,15 +31,15 @@ double Hartigan::calc_energy_change(const Cluster& a, const Cluster &b, int npoi
     return entropy_a - entropy_b;
 }
 
-SingleResult Hartigan::single_loop(const arma::mat &points, std::vector<unsigned int> &assignment,
+SingleResult Hartigan::single_loop(const Dataset &points, std::vector<unsigned int> &assignment,
                                    double kill_threshold, std::vector<boost::shared_ptr<Cluster> > &clusters) {
 
     int switched = 0;  //numer of points who has been moved to another cluster
-    int dimension = points.n_cols;
-    unsigned int npoints = points.n_rows;
+    int dimension = points.dim();
+    unsigned int npoints = points.size();
     for(unsigned int i = 0; i < npoints; i++) {
         unsigned int source = assignment[i];
-        arma::rowvec point = points.row(i);
+        arma::rowvec point = points.getPoint(i);
 
         for(unsigned int k = 0; k < clusters.size(); k++)
             if(k != source) {
@@ -106,20 +106,20 @@ SingleResult Hartigan::single_loop(const arma::mat &points, std::vector<unsigned
 }
 
 
-void Hartigan::remove_cluster(unsigned int source, const arma::mat &points,
+void Hartigan::remove_cluster(unsigned int source, const Dataset &points,
                               std::vector<unsigned int> &assignment,
                               std::vector<boost::shared_ptr<Cluster> > &clusters) {
     //delete cluster
     clusters.erase(clusters.begin() + source);
 
     //assign points of erased cluster
-    unsigned int npoints = points.n_rows;
+    unsigned int npoints = points.size();
     for(unsigned int j = 0; j < npoints; j++) {
 
         //find point of deleted cluster
         if(assignment[j] == source) {
 
-            arma::rowvec point_to_assign = points.row(j);
+            arma::rowvec point_to_assign = points.getPoint(j);
             int min_energy_change_element_index = -1;
             boost::shared_ptr<Cluster> min_energy_change_cluster;
             double min_energy_change = std::numeric_limits<double>::max();
