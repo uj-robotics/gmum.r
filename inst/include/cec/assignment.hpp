@@ -43,12 +43,14 @@ unsigned int find_nearest(unsigned int i,
  */
 
 template <class T>
-void assignPoints(std::vector<unsigned int> &assignment,
+void assign_points(std::vector<unsigned int> &assignment,
 		  const T &centers,
 		  const Dataset &points) {
 
     for(unsigned int i=0; i<assignment.size(); ++i)
-      assignment[i] = findNearest(i, centers, points);
+      assignment[i] = find_nearest(i, centers, points);
+}
+
 }
 
 #endif

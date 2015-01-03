@@ -136,8 +136,8 @@ void CecModel::find_best_cec() {
     Assignment *assignment_type = NULL;
     switch (this->m_config.get_params().assignment_type) {
     case krandom:
-        assignment_type = new RandomAssignment(*(m_config.get_params().dataset),
-                                               m_config.get_params().nclusters);
+      //assignment_type = new RandomAssignment(*(m_config.get_params().dataset),
+      //                                         m_config.get_params().nclusters);
         break;
     case kkmeanspp:
         assignment_type = new KmeansppAssignment(*(m_config.get_params().dataset),
@@ -197,7 +197,7 @@ double CecModel::entropy() {
     return s;
 }
 
-boost::shared_ptr<std::vector<unsigned int> > &CecModel::get_assignment() const {
+boost::shared_ptr<std::vector<unsigned int> > CecModel::get_assignment() const {
     return m_assignment;
 }
 

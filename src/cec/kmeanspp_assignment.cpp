@@ -54,15 +54,15 @@ void KmeansppAssignment::operator()(std::vector<unsigned int> &assignment) {
 }
 
 void calculate_distance(const std::vector<unsigned int> &centers,
-                        std::list<Pair> &selected, const arma::mat &points) {
+                        std::list<Pair> &selected, const Dataset &points) {
 
     for (std::list<Pair>::iterator it = selected.begin(); it != selected.end();
          ++it) {
-        arma::rowvec point = points.row(it->point_number);
+        arma::rowvec point = points.getPoint(it->point_number);
         float distance = std::numeric_limits<float>::max();
 
         for (unsigned int i = 0; i < centers.size(); ++i) {
-            arma::rowvec vec = points.row(centers[i]) - point;
+            arma::rowvec vec = points.getPoint(centers[i]) - point;
             float temp_dist = arma::as_scalar(vec * vec.t());
             if (distance > temp_dist)
                 distance = temp_dist;

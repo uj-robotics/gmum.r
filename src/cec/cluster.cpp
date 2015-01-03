@@ -8,22 +8,22 @@ Cluster::Cluster(int count, const arma::rowvec &mean) :
 }
 
 Cluster::Cluster(unsigned int id, const std::vector<unsigned int> &assignment,
-                 const arma::mat &points) {
+                 const Dataset &points) {
     initialize_mean(id, assignment, points);
     if (m_count == 0)
         throw(NoPointsInCluster());
 
-    m_n = points.n_cols;
+    m_n = points.dim();
 }
 
 arma::rowvec Cluster::initialize_mean(unsigned int id,
-                                      const std::vector<unsigned int> &assignment, const arma::mat &points) {
-    int dimention = points.n_cols;
+                                      const std::vector<unsigned int> &assignment, const Dataset &points) {
+  int dimention = points.dim();
     m_count = 0;
     m_mean = arma::rowvec(dimention, arma::fill::zeros);
-    for (unsigned int i = 0; i < points.n_rows; i++) {
+    for (unsigned int i = 0; i < points.size(); i++) {
         if (assignment[i] == id) {
-            m_mean += points.row(i);
+  	    m_mean += points.getPoint(i);
             m_count += 1;
         }
     }
@@ -45,13 +45,13 @@ double Cluster::entropy() const {
 }
 
 void ClusterUseCovMat::initialize_cov_mat(unsigned int id,
-                                          const std::vector<unsigned int> &assignment, const arma::mat &points) {
-    int dimension = points.n_cols;
+                                          const std::vector<unsigned int> &assignment, const Dataset &points) {
+    int dimension = points.dim();
     arma::rowvec m = m_mean;
     arma::mat out(dimension, dimension, arma::fill::zeros);
-    for (unsigned int i = 0; i < points.n_rows; i++)
+    for (unsigned int i = 0; i < points.size(); i++)
         if (assignment[i] == id) {
-            arma::rowvec point = points.row(i);
+            arma::rowvec point = points.getPoint(i);
             arma::rowvec tmp = point - m;
             out += (tmp.t() * tmp) / (m_count);
         }
@@ -65,7 +65,7 @@ ClusterUseCovMat::ClusterUseCovMat(int count, const arma::rowvec &mean,
 }
 
 ClusterUseCovMat::ClusterUseCovMat(unsigned int id,
-                                   const std::vector<unsigned int> &assignment, const arma::mat &points) :
+                                   const std::vector<unsigned int> &assignment, const Dataset &points) :
     Cluster(id, assignment, points) {
     initialize_cov_mat(id, assignment, points);
 }
@@ -91,7 +91,7 @@ boost::shared_ptr<Cluster> ClusterUseCovMat::remove_point(
 }
 
 arma::mat ClusterUseCovMat::get_cov_mat(unsigned int id,
-                                        const std::vector<unsigned int> &assignment, const arma::mat &points) {
+                                        const std::vector<unsigned int> &assignment, const Dataset &points) {
     return m_cov_mat;
 }
 
@@ -101,18 +101,18 @@ ClusterOnlyTrace::ClusterOnlyTrace(int count, const arma::rowvec & mean,
 }
 
 ClusterOnlyTrace::ClusterOnlyTrace(unsigned int id,
-                                   const std::vector<unsigned int> & assignment, const arma::mat & points) :
+                                   const std::vector<unsigned int> & assignment, const Dataset & points) :
     Cluster(id, assignment, points) {
     initialize_mean(id, assignment, points);
     compute_cov_mat_trace(id, assignment, points);
 }
 
 void ClusterOnlyTrace::compute_cov_mat_trace(unsigned int id,
-                                             const std::vector<unsigned int> &assignment, const arma::mat &points) {
+                                             const std::vector<unsigned int> &assignment, const Dataset &points) {
     m_cov_mat_trace = 0.0;
-    for (unsigned int i = 0; i < points.n_rows; i++)
+    for (unsigned int i = 0; i < points.size(); i++)
         if (assignment[i] == id) {
-            arma::rowvec point = points.row(i);
+            arma::rowvec point = points.getPoint(i);
             arma::rowvec tmp = point - m_mean;
             m_cov_mat_trace += dot(tmp, tmp);
         }
@@ -148,11 +148,11 @@ double ClusterOnlyTrace::get_cov_mat_trace() {
 }
 
 arma::mat ClusterOnlyTrace::get_cov_mat(unsigned int id,
-                                        const std::vector<unsigned int> &assignment, const arma::mat &points) {
+                                        const std::vector<unsigned int> &assignment, const Dataset &points) {
     arma::mat out(m_n, m_n, arma::fill::zeros);
-    for (unsigned int i = 0; i < points.n_rows; i++) {
+    for (unsigned int i = 0; i < points.size(); i++) {
         if (assignment[i] == id) {
-            arma::rowvec point = points.row(i);
+            arma::rowvec point = points.getPoint(i);
             arma::rowvec tmp = point - m_mean;
             out += (tmp.t() * tmp) / (m_count);
         }
@@ -177,13 +177,13 @@ ClusterStandard::ClusterStandard(int count, const arma::rowvec &_mean,
 }
 
 ClusterStandard::ClusterStandard(unsigned int id,
-                                 const std::vector<unsigned int> &assignment, const arma::mat &points) :
+                                 const std::vector<unsigned int> &assignment, const Dataset &points) :
     ClusterUseCovMat(id, assignment, points) {
     calculate_entropy();
 }
 
 ClusterCovMat::ClusterCovMat(const arma::mat & sigma, unsigned int id,
-                             const std::vector<unsigned int> &assignment, const arma::mat &points) :
+                             const std::vector<unsigned int> &assignment, const Dataset &points) :
     ClusterUseCovMat(id, assignment, points) {
     m_sigma_det = arma::det(sigma);
     m_inv_sigma = arma::inv(sigma);
@@ -206,7 +206,7 @@ boost::shared_ptr<ClusterUseCovMat> ClusterCovMat::create_instance(int count,
 }
 
 ClusterConstRadius::ClusterConstRadius(double r, unsigned int id,
-                                       const std::vector<unsigned int> &assignment, const arma::mat &points) :
+                                       const std::vector<unsigned int> &assignment, const Dataset &points) :
     ClusterOnlyTrace(id, assignment, points), m_r(r) {
     calculate_entropy();
 }
@@ -227,7 +227,7 @@ boost::shared_ptr<ClusterOnlyTrace> ClusterConstRadius::create_instance(int coun
 }
 
 ClusterSpherical::ClusterSpherical(unsigned int id,
-                                   const std::vector<unsigned int> &assignment, const arma::mat &points) :
+                                   const std::vector<unsigned int> &assignment, const Dataset &points) :
     ClusterOnlyTrace(id, assignment, points) {
     calculate_entropy();
 }
@@ -249,7 +249,7 @@ boost::shared_ptr<ClusterOnlyTrace> ClusterSpherical::create_instance(int count,
 }
 
 ClusterDiagonal::ClusterDiagonal(unsigned int id,
-                                 const std::vector<unsigned int> &assignment, const arma::mat &points) :
+                                 const std::vector<unsigned int> &assignment, const Dataset &points) :
     ClusterUseCovMat(id, assignment, points) {
     calculate_entropy();
 }
