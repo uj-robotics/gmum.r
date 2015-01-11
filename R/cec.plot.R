@@ -24,14 +24,18 @@ evalqOnLoad({
 
         d = x$x()
         if (length(slice)==0) {
-            slice = c(1:(dim(d)[2]))
+            slice = c(1:(d$dim()))
+        }
+
+        m <- matrix(d$getPoint(0), ncol=d$dim())
+        for(i in 1:(d$size()-1)) {
+            m <- rbind(m, d$getPoint(i))
         }
         
         if (length(slice)==2) {
-            plot(d[,slice], col = (x$y() + 1))
-        }
-        else{
-            pairs(d[,slice],col = (x$y()+1))
+            plot(m[,slice], col = (x$y() + 1))
+        } else {
+            pairs(m[,slice],col = (x$y()+1))
         }
 
         if (ellipses || centers) {
