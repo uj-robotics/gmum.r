@@ -1,3 +1,6 @@
+svm.data.root <- system.file("data_sets", "svm", package="gmum.r")
+svm.colon_cancer.path <- file.path(svm.data.root, "colon-cancer")
+
 svm.lib.libsvm <- "libsvm"
 svm.lib.svmlight <- "svmlight"
 
@@ -33,6 +36,11 @@ svm.dataset.xor <- function() {
     ncol=3,
     nrow=4,
     dimnames=list(c(),c("x","y","t")))
+}
+
+svm.dataset.colon_cancer <- function() {
+  bc <- read.libsvm(svm.colon_cancer.path, 2000)
+  return(bc)
 }
 
 svm.accuracy <- function(prediction, target) {
@@ -83,4 +91,33 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 }
 
 
-
+read.libsvm <- function(filename, dimensionality) {
+  
+  content = readLines( filename )
+  num_lines = length( content )
+  yx = matrix( 0, num_lines, dimensionality + 1 )
+  
+  # loop over lines
+  for ( i in 1:num_lines ) {
+    
+    # split by spaces
+    line = as.vector( strsplit( content[i], ' ' )[[1]])
+    
+    # save label
+    yx[i,1] = as.numeric( line[[1]] )
+    
+    # loop over values
+    for ( j in 2:length( line )) {
+      
+      # split by colon
+      index_value = strsplit( line[j], ':' )[[1]]
+      
+      index = as.numeric( index_value[1] ) + 1    # +1 because label goes first
+      value = as.numeric( index_value[2] )
+      
+      yx[i, index] = value
+    }
+  }
+  
+  return( data.frame(yx, stringsAsFactors=FALSE) )
+}
