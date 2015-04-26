@@ -102,8 +102,8 @@ SingleResult Hartigan::single_loop(const arma::mat &points,
         if (best_cluster != -1) {
             switched++;
 
-            clusters_raw[source]->remove_point(point);
-            clusters_raw[best_cluster]->add_point(point);
+            clusters_raw[source]->remove_last_point();
+            clusters_raw[best_cluster]->add_last_point();
 
             //point moved from cluster source to k - update assignment
             assignment[i] = best_cluster;
@@ -204,18 +204,16 @@ void Hartigan::remove_cluster(unsigned int source, const arma::mat &points,
 
             //find the best cluster to assign the point to it
             for (unsigned int k = 0; k < clusters.size(); k++) {
+                
 
                 double before_energy = calc_energy(clusters[k]->entropy(),
                                                 clusters[k]->size(), npoints);
 
-                clusters[k]->add_point(point_to_assign);
+                double after_energy = calc_energy(clusters[k]->entropy_after_add_point(point_to_assign), clusters[k]->size() + 1, npoints);
 
                 //std::cerr<<clusters[k]->entropy()<<std::endl;
 
-                double energy_change = calc_energy(clusters[k]->entropy(),
-                                                clusters[k]->size(), npoints) - before_energy;
-
-                clusters[k]->remove_point(point_to_assign);
+                double energy_change = after_energy - before_energy;
 
                 if(!std::isnormal(energy_change)) { continue; } // ignore degenerated clusters
 
@@ -223,7 +221,6 @@ void Hartigan::remove_cluster(unsigned int source, const arma::mat &points,
                     min_energy_change = energy_change;
                     min_energy_change_element_index = k;
                 }
-
             }
 #ifdef DEBUG
             assert(min_energy_change_element_index > -1);
@@ -242,10 +239,8 @@ void Hartigan::remove_cluster(unsigned int source, const arma::mat &points,
             }
 
             //we are here adding and then removing
-            clusters[min_energy_change_element_index]->add_point(
-                        point_to_assign);
+            clusters[min_energy_change_element_index]->add_point(point_to_assign);
             assignment[j] = min_energy_change_element_index;
-
         } else if (assignment[j] > source) {
             assignment[j]--;
         }

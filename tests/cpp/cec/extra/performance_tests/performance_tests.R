@@ -70,4 +70,4 @@ perf_cran_cec <- function(method_type, points) {
     return (cran_cec(nclusters = 3, nstart = 1, points = points, init_type = 'random', method_type = method_type, max_iterations = 200, eps = "5%"))
 }
 
-run_tests(npoints_start=200, ndatasets=10, npoints_step=500, averaging=5, gmum_cec_function=perf_gmum_cec, cran_cec_function=perf_cran_cec)
+run_tests(npoints_start=200, ndatasets=20, npoints_step=500, averaging=5, gmum_cec_function=perf_gmum_cec, cran_cec_function=perf_cran_cec)

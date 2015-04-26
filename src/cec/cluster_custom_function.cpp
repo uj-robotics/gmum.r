@@ -4,19 +4,16 @@ namespace gmum {
 
 #ifdef RCPP_INTERFACE
 
-ClusterCustomFunction::ClusterCustomFunction(int count,
-		const arma::rowvec& mean, const arma::mat& cov_mat,
-		boost::shared_ptr<Rcpp::Function> function) :
-ClusterUseCovMat(count, mean, cov_mat), m_function(function) {
-	m_entropy = calculate_entropy(m_n, cov_mat);
-}
-
 ClusterCustomFunction::ClusterCustomFunction(unsigned int id,
 		const std::vector<unsigned int> &assignment, const arma::mat &points,
 		boost::shared_ptr<Rcpp::Function> function) :
 ClusterUseCovMat(id, assignment, points), m_function(function) {
-	m_entropy = calculate_entropy(m_n, m_cov_mat);
+	m_entropy.second = calculate_entropy(m_n, *m_cov_mat.second);
 }
+
+ClusterCustomFunction::ClusterCustomFunction ( const ClusterCustomFunction& other ) 
+    : ClusterUseCovMat(other), m_function(other.m_function)
+{ }
 
 double ClusterCustomFunction::calculate_entropy(int n,
 		const arma::mat &cov_mat) {
@@ -28,7 +25,7 @@ double ClusterCustomFunction::calculate_entropy(int n,
 
 ClusterCustomFunction* ClusterCustomFunction::clone()
 {
-	return new ClusterCustomFunction(m_count, m_mean, m_cov_mat, m_function);
+    return new ClusterCustomFunction(*this);
 }
 
 #endif

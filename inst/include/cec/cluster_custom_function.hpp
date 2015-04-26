@@ -19,11 +19,10 @@ namespace gmum {
 		boost::shared_ptr<Rcpp::Function> m_function;
 		double calculate_entropy(int n, const arma::mat &cov_mat);
 	public:
-		ClusterCustomFunction(int count, const arma::rowvec& mean,
-				const arma::mat& cov_mat, boost::shared_ptr<Rcpp::Function> function);
 		ClusterCustomFunction(unsigned int id,
 				const std::vector<unsigned int> &assignment,
 				const arma::mat &points, boost::shared_ptr<Rcpp::Function> function);
+        ClusterCustomFunction(const ClusterCustomFunction& other); 
 		virtual ClusterCustomFunction* clone();
 	};
 

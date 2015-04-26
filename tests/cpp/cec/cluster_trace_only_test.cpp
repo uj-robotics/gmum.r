@@ -32,7 +32,6 @@ TEST(CEC_TraceOnly,AddPoint) {
     boost::scoped_ptr<Cluster> m(new ClusterSpherical(id,fits,init_matrix));
     // Dodajemy element o indeksie i
     for (int i = beg; i < n-1; ++i) {
-
         arma::mat tmp_matrix(i+1,dim);
         for (int j = 0; j <=i; ++j) {
             tmp_matrix.row(j) = data.row(j);
